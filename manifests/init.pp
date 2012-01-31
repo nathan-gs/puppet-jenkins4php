@@ -101,5 +101,4 @@ class jenkins4php {
 		source => "puppet:///modules/jenkins4php/php-template/LICENSE"
 	}
 	
-	Class['jenkins::repo'] -> Class['jenkins::package'] -> Class['jenkins::service'] -> Class['phpqatools'] -> Class['jenkins4php']
 }
