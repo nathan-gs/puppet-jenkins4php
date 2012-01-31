@@ -79,21 +79,6 @@ class jenkins4php {
             name => "build-pipeline-plugin";
     }
 
-	# PHP Template Job (see: http://jenkins-php.org/)
-	$jenkins_dir = '/var/lib/jenkins'
-
-    case $operatingsystem {
-        ubuntu: {
-            $jenkins_reload_exec = "service jenkins reload"
-        }
-        debian: {
-            $jenkins_reload_exec = "/etc/init.d/jenkins reload"
-        }
-        default: {
-            $jenkins_reload_exec = "java -jar ${jenkins_dir}/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 reload-configuration"
-        }
-    }
-
 	file { "${jenkins_dir}/jobs":
 		owner => "jenkins",
 		group => "jenkins",
@@ -107,16 +92,13 @@ class jenkins4php {
 	file { "${jenkins_dir}/jobs/php-template/config.xml":
 		owner => "jenkins",
 		group => "jenkins",
-		source => "puppet:///modules/jenkins4php/php-template/config.xml"
+		source => "puppet:///modules/jenkins4php/php-template/config.xml",
+        notify  => Service['jenkins']
 	}
 	file { "${jenkins_dir}/jobs/php-template/LICENSE":
 		owner => "jenkins",
 		group => "jenkins",
 		source => "puppet:///modules/jenkins4php/php-template/LICENSE"
-	}
-	exec {
-		"${jenkins_reload_exec}":
-		require => File["${jenkins_dir}/jobs/php-template/config.xml"]
 	}
 	
 	Class['jenkins::repo'] -> Class['jenkins::package'] -> Class['jenkins::service'] -> Class['phpqatools'] -> Class['jenkins4php']
